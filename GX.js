@@ -14,6 +14,9 @@
     //Function to create an actual dom
     function createDomElement(myObj) {
       var elementObj = document.createElement(myObj.type);
+      if (typeof myObj.text === "string") {
+        elementObj.innerText = myObj.text;
+      }
       if (myObj.attr.length > 0) {
         for (var i = 0; i < myObj.attr.length; i++) {
           elementObj.setAttribute(
@@ -27,12 +30,35 @@
           elementObj.append(createDomElement(myObj.child[i]));
         }
       }
+
       return elementObj;
     }
     return outputDomElement;
   }
+
   var newElem = {};
-  GXDom.__proto__.create = function (elementObj) {
+  GXDom.__proto__.create = function (tag, attr, text, child) {
+    var element = {};
+    if (typeof tag === "undefined") {
+      return "Please add a valid tag";
+    }
+    if (typeof tag === "string") {
+      element.type = tag;
+    }
+    if (typeof attr === "object") {
+      element.attr = attr;
+    }
+    if (typeof text === "string") {
+      element.text = text;
+    }
+    if (typeof element.child === "object") {
+      element.child = [];
+      element.child.push(child);
+    }
+
+    return this.createElement(element);
+  };
+  GXDom.__proto__.createElement = function (elementObj) {
     if (!elementObj) {
       return "Please pass the element oject to create object model";
     }
@@ -41,28 +67,57 @@
     }
 
     newElem.type = elementObj.type;
-
+    newElem.attr = null;
     if (elementObj.attr && typeof elementObj.attr === "object") {
       newElem.attr = elementObj.attr;
     }
     if (elementObj.child && typeof elementObj.child === "object") {
       newElem.child = elementObj.child;
     }
-
-    return newElem;
+    if (elementObj.text && typeof elementObj.text === "string") {
+      newElem.text = elementObj.text;
+    }
+    newElem.__proto__.set = set;
+    newElem.__proto__.addChild = addChild;
+    newElem.__proto__.setText = setText;
+    return Object.assign({}, newElem);
   };
 
-  GXDom.__proto__.set = function (key, value) {
-    for (var i = 0; i < newElem.attr.length; i++) {
-      var getKey = Object.keys(newElem.attr[i])[0];
-      if (getKey === key) {
-        newElem.attr[i][key] = value;
+  var set = function (key, value) {
+    var changed = false;
+    if (key && value) {
+      for (var i = 0; i < this.attr.length; i++) {
+        var getKey = Object.keys(this.attr[i])[0];
+        if (getKey === key) {
+          this.attr[i][key] = value;
+          changed = true;
+        }
+      }
+      if (!changed) {
+        this.attr.push({ [key]: value });
       }
     }
+
+    return this;
   };
 
-  GXDom.__proto__.addChild = function (elem) {
-    newElem.child.push(elem);
+  var setText = function (text) {
+    if (typeof text === "string") {
+      this.text = text;
+    }
+
+    return this;
+  };
+
+  var addChild = function (elem) {
+    if (this.child) {
+      this.child.push(elem);
+    } else {
+      this.child = [];
+      this.text = null;
+      this.child.push(elem);
+    }
+    return this;
   };
 
   return GXDom;
