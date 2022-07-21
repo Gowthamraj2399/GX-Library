@@ -12,13 +12,7 @@ var iconContainer = GX.create("div", [
   },
 ]);
 
-var icon = GX.create("h1", [{ class: "fw-bold" }, { id: "my-id" }], "GX");
-
-var menu = GX.create("div", [
-  {
-    class: "d-flex gap-4",
-  },
-]);
+var icon = GX.create("h1", [{ class: "fw-bold" }, { id: "my-id" }], "G");
 
 var menuItem1 = GX.create(
   "h3",
@@ -38,11 +32,22 @@ var menuItem2 = GX.create(
   ],
   "Menu2"
 );
+var menu = GX.create(
+  "div",
+  [
+    {
+      class: "d-flex gap-4",
+    },
+  ],
+  null,
+  [menuItem1, menuItem2]
+);
 
 iconContainer.addChild(icon);
 menu.addChild(menuItem1).addChild(menuItem2);
-myHeader.addChild(iconContainer).addChild(menu);
-
+// myHeader.addChild(iconContainer).addChild(menu);
+console.log(menu);
 var Dom = GX(myHeader);
+console.log(Dom);
 
 document.body.append(Dom);

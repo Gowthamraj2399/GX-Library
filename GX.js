@@ -36,7 +36,6 @@
     return outputDomElement;
   }
 
-  var newElem = {};
   GXDom.__proto__.create = function (tag, attr, text, child) {
     var element = {};
     if (typeof tag === "undefined") {
@@ -51,36 +50,14 @@
     if (typeof text === "string") {
       element.text = text;
     }
-    if (typeof element.child === "object") {
-      element.child = [];
-      element.child.push(child);
+    if (typeof child === "object") {
+      element.child = child;
     }
-
-    return this.createElement(element);
-  };
-  GXDom.__proto__.createElement = function (elementObj) {
-    if (!elementObj) {
-      return "Please pass the element oject to create object model";
-    }
-    if (!elementObj.type && typeof elementObj.type === "string") {
-      return "Please pass the element object with correct type";
-    }
-
-    newElem.type = elementObj.type;
-    newElem.attr = null;
-    if (elementObj.attr && typeof elementObj.attr === "object") {
-      newElem.attr = elementObj.attr;
-    }
-    if (elementObj.child && typeof elementObj.child === "object") {
-      newElem.child = elementObj.child;
-    }
-    if (elementObj.text && typeof elementObj.text === "string") {
-      newElem.text = elementObj.text;
-    }
-    newElem.__proto__.set = set;
-    newElem.__proto__.addChild = addChild;
-    newElem.__proto__.setText = setText;
-    return Object.assign({}, newElem);
+    element.__proto__.set = set;
+    element.__proto__.addChildren = addChildren;
+    element.__proto__.setText = setText;
+    element.__proto__.clone = cloneObj;
+    return Object.assign({}, element);
   };
 
   var set = function (key, value) {
@@ -101,23 +78,30 @@
     return this;
   };
 
-  var setText = function (text) {
-    if (typeof text === "string") {
-      this.text = text;
+  var setText = function (newText) {
+    if (typeof newText === "string") {
+      this.text = newText;
     }
 
     return this;
   };
 
-  var addChild = function (elem) {
-    if (this.child) {
-      this.child.push(elem);
+  var addChildren = function (elem) {
+    if (Array.isArray(elem)) {
+      this.child = elem;
     } else {
-      this.child = [];
-      this.text = null;
-      this.child.push(elem);
+      if (this.child) {
+        this.child.push(elem);
+      } else {
+        this.child = [];
+        this.child.push(elem);
+      }
     }
     return this;
+  };
+
+  var cloneObj = function () {
+    return Object.assign({}, this);
   };
 
   return GXDom;
