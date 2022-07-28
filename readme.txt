@@ -1,4 +1,4 @@
-GX - A javascript dom manipulation library.
+<h1>GX - A javascript dom manipulation library.</h1>
 
 Functionalities covered.
 
